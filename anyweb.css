@@ -1,5 +1,7 @@
-body { width: 40em; padding: 0px 0px;
-       margin: 2em; 
+body { width: 50em; padding: 0px 0px;
+       margin: 2em; font-size: 95%;
+       font-family: serif;
+       text-align: justify;
        background-color: white }
 
 div.p {
