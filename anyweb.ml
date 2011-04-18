@@ -39,19 +39,34 @@ ocamlc unix.cma anyweb.ml -o anyweb
 This document comes from {t|anyweb}'s source {i|piped}
 to {link http://bracetax.berlios.de/ |bracetax}:
 {code}
-anyweb camlbrtx anyweb.ml | \
+anyweb camlbrtxhtml anyweb.ml | \
     brtx -doc -o index.html  -title "The anyweb Source" -link-css anyweb.css
 {end}
 if you are curious, here is {link ./anyweb_no_css.html|a version without CSS}
 (i.e. with {t|-link-css anyweb.css}).
 {p}
-This other example {link coq_example.html|documents a {i|Coq} file}:
+The same way we can make {link ./anyweb.pdf |a PDF}:
 {code}
-anyweb coqbrtx subset_notes.v | \
-    brtx -o coq_example.html -doc -link-css anyweb.css 
+anyweb camlbrtxlatex anyweb.ml | \
+    brtx -latex -doc -o anyweb.tex  -title "The anyweb Source"
+pdflatex anyweb
 {end}
-(there are some notes taken while {i|doing} {link http://adam.chlipala.net/cpdt/
-|CPDT}{~}{...} worth reading!).
+
+This other example {i|documents}
+{link https://github.com/smondet/anyweb/blob/master/subset_notes.v
+|a Coq {t|.v} file}:
+{code}
+anyweb coqbrtxhtml subset_notes.v | \
+    brtx -o coq_example.html -doc -link-css anyweb.css 
+anyweb coqbrtxlatex subset_notes.v | \
+    brtx -latex -o coq_example.tex -doc -use-package coqdoc
+pdflatex coq_example
+{end}
+The results are some pieces of
+{link coq_example.html|HTML} and
+{link coq_example.pdf|PDF}.
+(these are some notes taken while {i|doing} {link http://adam.chlipala.net/cpdt/
+|CPDT}{~}{...} which is worth reading!).
 
 {section 1|The Code}
 
@@ -273,10 +288,12 @@ let is_whitespace s =
 This gives the {t|coqbrtx} transformer:
   B*)
 
-let coqbrtx = 
+let coqbrtx fmt = 
   let coqdoc =
-    "cat > /tmp/ttt.v ; coqdoc -s --parse-comments --stdout \
-      --body-only --no-index /tmp/ttt.v" in 
+    sprintf
+      "cat > /tmp/ttt.v ; coqdoc -s --parse-comments --stdout \
+        --body-only --no-index %s /tmp/ttt.v"
+      (match fmt with `html -> "--html" | `latex -> "--latex") in 
   [
     "coq",  
     (let on_text, on_end =
@@ -292,10 +309,12 @@ let coqbrtx =
 
 (*B {p}
 And similarly the {t|camlbrtx} one:  B*)
-let camlbrtx = [
+let camlbrtx fmt = [
   "caml",  
   (let on_text, on_end =
-     let cmd = "source-highlight -s caml -f xhtml" in
+     let cmd = 
+       sprintf "source-highlight -s caml -f %s" 
+         (match fmt with `html -> "xhtml" | `latex -> "latex") in
      bufferise_and_do (fun input ->
        if is_whitespace input then "# Removed whitespace\n"
        else
@@ -310,8 +329,10 @@ let camlbrtx = [
 let () =
   let lang = 
     try match Sys.argv.(1) with
-    | "coqbrtx" -> coqbrtx
-    | "camlbrtx" -> camlbrtx
+    | "coqbrtxhtml" -> coqbrtx `html
+    | "coqbrtxlatex" -> coqbrtx `latex
+    | "camlbrtxhtml" -> camlbrtx `html
+    | "camlbrtxlatex" -> camlbrtx `latex
     | _ -> test_environments
     with e -> test_environments in
   let i = try open_in Sys.argv.(2) with e -> stdin in
