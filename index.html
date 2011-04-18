@@ -23,13 +23,20 @@ ocamlc unix.cma anyweb.ml -o anyweb
 </pre>  </div>
 <h2>Running Examples</h2>
 <div class="p">  This document comes from <tt>anyweb</tt>'s source <i>piped</i> to <a href="http://bracetax.berlios.de/">bracetax</a>: <pre>
-anyweb camlbrtx anyweb.ml | \
+anyweb camlbrtxhtml anyweb.ml | \
     brtx -doc -o index.html  -title "The anyweb Source" -link-css anyweb.css
 </pre> if you are curious, here is <a href="./anyweb_no_css.html">a version without CSS</a> (i.e. with <tt>-link-css anyweb.css</tt>). </div>
-<div class="p"> This other example <a href="coq_example.html">documents a <i>Coq</i> file</a>: <pre>
-anyweb coqbrtx subset_notes.v | \
+<div class="p"> The same way we can make <a href="./anyweb.pdf">a PDF</a>: <pre>
+anyweb camlbrtxlatex anyweb.ml | \
+    brtx -latex -doc -o anyweb.tex  -title "The anyweb Source"
+pdflatex anyweb
+</pre>  This other example <i>documents</i> <a href="https://github.com/smondet/anyweb/blob/master/subset_notes.v">a Coq <tt>.v</tt> file</a>: <pre>
+anyweb coqbrtxhtml subset_notes.v | \
     brtx -o coq_example.html -doc -link-css anyweb.css 
-</pre> (there are some notes taken while <i>doing</i> <a href="http://adam.chlipala.net/cpdt/">CPDT</a>&nbsp;&hellip; worth reading!).  </div>
+anyweb coqbrtxlatex subset_notes.v | \
+    brtx -latex -o coq_example.tex -doc -use-package coqdoc
+pdflatex coq_example
+</pre> The results are some pieces of <a href="coq_example.html">HTML</a> and <a href="coq_example.pdf">PDF</a>. (these are some notes taken while <i>doing</i> <a href="http://adam.chlipala.net/cpdt/">CPDT</a>&nbsp;&hellip; which is worth reading!).  </div>
 <h2>The Code</h2>
 <div class="p">  We do not print the code for: <pre>
 val split : string -&gt; string -&gt; string * string
@@ -198,10 +205,12 @@ http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>
 
-<span style="font-weight: bold"><span style="color: #0000FF">let</span></span> coqbrtx <span style="color: #990000">=</span> 
+<span style="font-weight: bold"><span style="color: #0000FF">let</span></span> coqbrtx fmt <span style="color: #990000">=</span> 
   <span style="font-weight: bold"><span style="color: #0000FF">let</span></span> coqdoc <span style="color: #990000">=</span>
-    "cat <span style="color: #990000">&gt;</span> <span style="color: #990000">/</span>tmp<span style="color: #990000">/</span>ttt<span style="color: #990000">.</span>v <span style="color: #990000">;</span> coqdoc <span style="color: #990000">-</span>s <span style="color: #990000">--</span>parse<span style="color: #990000">-</span>comments <span style="color: #990000">--</span>stdout <span style="color: #990000">\</span>
-      <span style="color: #990000">--</span>body<span style="color: #990000">-</span>only <span style="color: #990000">--</span>no<span style="color: #990000">-</span>index <span style="color: #990000">/</span>tmp<span style="color: #990000">/</span>ttt<span style="color: #990000">.</span>v" <span style="font-weight: bold"><span style="color: #0000FF">in</span></span> 
+    sprintf
+      "cat <span style="color: #990000">&gt;</span> <span style="color: #990000">/</span>tmp<span style="color: #990000">/</span>ttt<span style="color: #990000">.</span>v <span style="color: #990000">;</span> coqdoc <span style="color: #990000">-</span>s <span style="color: #990000">--</span>parse<span style="color: #990000">-</span>comments <span style="color: #990000">--</span>stdout <span style="color: #990000">\</span>
+        <span style="color: #990000">--</span>body<span style="color: #990000">-</span>only <span style="color: #990000">--</span>no<span style="color: #990000">-</span>index <span style="color: #990000">%</span>s <span style="color: #990000">/</span>tmp<span style="color: #990000">/</span>ttt<span style="color: #990000">.</span>v"
+      <span style="color: #990000">(</span><span style="font-weight: bold"><span style="color: #0000FF">match</span></span> fmt <span style="font-weight: bold"><span style="color: #0000FF">with</span></span> `html <span style="color: #990000">-&gt;</span> <span style="color: #FF0000">"--html"</span> <span style="color: #990000">|</span> `latex <span style="color: #990000">-&gt;</span> <span style="color: #FF0000">"--latex"</span><span style="color: #990000">)</span> <span style="font-weight: bold"><span style="color: #0000FF">in</span></span> 
   <span style="color: #990000">[</span>
     <span style="color: #FF0000">"coq"</span><span style="color: #990000">,</span>  
     <span style="color: #990000">(</span><span style="font-weight: bold"><span style="color: #0000FF">let</span></span> on_text<span style="color: #990000">,</span> on_end <span style="color: #990000">=</span>
@@ -222,10 +231,12 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>
-<span style="font-weight: bold"><span style="color: #0000FF">let</span></span> camlbrtx <span style="color: #990000">=</span> <span style="color: #990000">[</span>
+<span style="font-weight: bold"><span style="color: #0000FF">let</span></span> camlbrtx fmt <span style="color: #990000">=</span> <span style="color: #990000">[</span>
   <span style="color: #FF0000">"caml"</span><span style="color: #990000">,</span>  
   <span style="color: #990000">(</span><span style="font-weight: bold"><span style="color: #0000FF">let</span></span> on_text<span style="color: #990000">,</span> on_end <span style="color: #990000">=</span>
-     <span style="font-weight: bold"><span style="color: #0000FF">let</span></span> cmd <span style="color: #990000">=</span> <span style="color: #FF0000">"source-highlight -s caml -f xhtml"</span> <span style="font-weight: bold"><span style="color: #0000FF">in</span></span>
+     <span style="font-weight: bold"><span style="color: #0000FF">let</span></span> cmd <span style="color: #990000">=</span> 
+       sprintf <span style="color: #FF0000">"source-highlight -s caml -f %s"</span> 
+         <span style="color: #990000">(</span><span style="font-weight: bold"><span style="color: #0000FF">match</span></span> fmt <span style="font-weight: bold"><span style="color: #0000FF">with</span></span> `html <span style="color: #990000">-&gt;</span> <span style="color: #FF0000">"xhtml"</span> <span style="color: #990000">|</span> `latex <span style="color: #990000">-&gt;</span> <span style="color: #FF0000">"latex"</span><span style="color: #990000">)</span> <span style="font-weight: bold"><span style="color: #0000FF">in</span></span>
      bufferise_and_do <span style="color: #990000">(</span><span style="font-weight: bold"><span style="color: #0000FF">fun</span></span> input <span style="color: #990000">-&gt;</span>
        <span style="font-weight: bold"><span style="color: #0000FF">if</span></span> is_whitespace input <span style="font-weight: bold"><span style="color: #0000FF">then</span></span> <span style="color: #FF0000">"# Removed whitespace\n"</span>
        <span style="font-weight: bold"><span style="color: #0000FF">else</span></span>
@@ -247,8 +258,10 @@ http://www.gnu.org/software/src-highlite -->
 <span style="font-weight: bold"><span style="color: #0000FF">let</span></span> <span style="color: #990000">()</span> <span style="color: #990000">=</span>
   <span style="font-weight: bold"><span style="color: #0000FF">let</span></span> lang <span style="color: #990000">=</span> 
     <span style="font-weight: bold"><span style="color: #0000FF">try</span></span> <span style="font-weight: bold"><span style="color: #0000FF">match</span></span> <span style="font-weight: bold"><span style="color: #000080">Sys</span></span><span style="color: #990000">.</span>argv<span style="color: #990000">.(</span><span style="color: #993399">1</span><span style="color: #990000">)</span> <span style="font-weight: bold"><span style="color: #0000FF">with</span></span>
-    <span style="color: #990000">|</span> <span style="color: #FF0000">"coqbrtx"</span> <span style="color: #990000">-&gt;</span> coqbrtx
-    <span style="color: #990000">|</span> <span style="color: #FF0000">"camlbrtx"</span> <span style="color: #990000">-&gt;</span> camlbrtx
+    <span style="color: #990000">|</span> <span style="color: #FF0000">"coqbrtxhtml"</span> <span style="color: #990000">-&gt;</span> coqbrtx `html
+    <span style="color: #990000">|</span> <span style="color: #FF0000">"coqbrtxlatex"</span> <span style="color: #990000">-&gt;</span> coqbrtx `latex
+    <span style="color: #990000">|</span> <span style="color: #FF0000">"camlbrtxhtml"</span> <span style="color: #990000">-&gt;</span> camlbrtx `html
+    <span style="color: #990000">|</span> <span style="color: #FF0000">"camlbrtxlatex"</span> <span style="color: #990000">-&gt;</span> camlbrtx `latex
     <span style="color: #990000">|</span> _ <span style="color: #990000">-&gt;</span> test_environments
     <span style="font-weight: bold"><span style="color: #0000FF">with</span></span> e <span style="color: #990000">-&gt;</span> test_environments <span style="font-weight: bold"><span style="color: #0000FF">in</span></span>
   <span style="font-weight: bold"><span style="color: #0000FF">let</span></span> i <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #0000FF">try</span></span> open_in <span style="font-weight: bold"><span style="color: #000080">Sys</span></span><span style="color: #990000">.</span>argv<span style="color: #990000">.(</span><span style="color: #993399">2</span><span style="color: #990000">)</span> <span style="font-weight: bold"><span style="color: #0000FF">with</span></span> e <span style="color: #990000">-&gt;</span> stdin <span style="font-weight: bold"><span style="color: #0000FF">in</span></span>
