@@ -13,7 +13,7 @@ Set Implicit Arguments.
 
 (*B {p}
 Also
-getting {t|MoreSpecif} from CPDT (achtung non-free licence).
+getting {t|MoreSpecif} from CPDT: # (achtung non-free licence).
 {code}
 coqc MoreSpecif.v
 {end}
@@ -76,7 +76,7 @@ Using Coq's:
 Inductive maybe (A : Set) (P : A -> Prop) : Set :=
     Unknown : maybe P | Found : forall x : A, P x -> maybe P
 {end}
-And Adams':
+And Adam's:
 {code}
 Notation "{{ x | P }}" := (maybe (fun x => P)).
 Notation "??" := (Unknown _).
