@@ -15,13 +15,15 @@
   <div class="subtitle">Literate Programming With Anything You May Find</div>
 </div> <!-- END HEADER -->
 <div class="p">
-    </div>
+  </div>
+<h2>Get</h2>
+<div class="p">  The code is in a <a href="https://github.com/smondet/anyweb">GitHub repository</a>.  </div>
 <h2>Compile</h2>
 <div class="p">  It is simple: <pre>
 ocamlc unix.cma anyweb.ml -o anyweb
 </pre>  </div>
-<h2>Running Examples</h2>
-<div class="p">  This document comes from <tt>anyweb</tt>'s source <i>piped</i> to <a href="http://bracetax.berlios.de/">bracetax</a>: <pre>
+<h2>Run Examples</h2>
+<div class="p">  This document comes from <tt>anyweb</tt> running on its source (<a href="https://github.com/smondet/anyweb/blob/master/anyweb.ml"><tt>anyweb.ml</tt></a>) <i>piped</i> to <a href="http://bracetax.berlios.de/">bracetax</a>: <pre>
 anyweb camlbrtxhtml anyweb.ml | \
     brtx -doc -o index.html  -title "The anyweb Source" -link-css anyweb.css
 </pre> if you are curious, here is <a href="./anyweb_no_css.html">a version without CSS</a> (i.e. with <tt>-link-css anyweb.css</tt>). </div>
@@ -35,8 +37,8 @@ anyweb coqbrtxhtml subset_notes.v | \
 anyweb coqbrtxlatex subset_notes.v | \
     brtx -latex -o coq_example.tex -doc -use-package coqdoc
 pdflatex coq_example
-</pre> The results are some pieces of <a href="coq_example.html">HTML</a> and <a href="coq_example.pdf">PDF</a>. (these are some notes taken while <i>doing</i> <a href="http://adam.chlipala.net/cpdt/">CPDT</a>&nbsp;&hellip; which is worth reading!).  </div>
-<h2>The Code</h2>
+</pre> The results are available in <a href="coq_example.html">HTML</a> and <a href="coq_example.pdf">PDF</a> (these are some notes taken while <i>doing</i> <a href="http://adam.chlipala.net/cpdt/">CPDT</a>).  </div>
+<h2>Read The Code</h2>
 <div class="p">  We do not print the code for: <pre>
 val split : string -&gt; string -&gt; string * string
 val line_opt : in_channel -&gt; string option
@@ -273,7 +275,8 @@ http://www.gnu.org/software/src-highlite -->
 <h2>To-Do List</h2>
 <div class="p">  
 <ul>
- <li> command-line-forged transformers </li>
+   <li> more transformers   </li>
+<li> command-line-forged transformers </li>
 </ul>
      </div>
 </body>

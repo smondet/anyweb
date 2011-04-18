@@ -23,7 +23,7 @@
 <br/>
 </div>
  </div>
-<div class="p"> Also getting <tt>MoreSpecif</tt> from CPDT (achtung non-free licence). <pre>
+<div class="p"> Also getting <tt>MoreSpecif</tt> from CPDT: <pre>
 coqc MoreSpecif.v
 </pre> <div class="code">
 
@@ -85,7 +85,7 @@ Notation "'Reduce' x" := (if x then Yes else No) (at level 50).
 <div class="p"> Using Coq's: <pre>
 Inductive maybe (A : Set) (P : A -&gt; Prop) : Set :=
     Unknown : maybe P | Found : forall x : A, P x -&gt; maybe P
-</pre> And Adams': <pre>
+</pre> And Adam's: <pre>
 Notation "{{ x | P }}" := (maybe (fun x =&gt; P)).
 Notation "??" := (Unknown _).
 Notation "[[ x ]]" := (Found _ x _).
