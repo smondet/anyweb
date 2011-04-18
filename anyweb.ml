@@ -26,7 +26,11 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
   {authors|{link http://seb.mondet.org|Sebastien Mondet}}
   {subtitle|Literate Programming With Anything You May Find}
 }
-  
+
+{section 1|Get}
+
+The code is in a {link https://github.com/smondet/anyweb |GitHub repository}.
+
 {section 1|Compile}
 
 It is simple:
@@ -34,15 +38,19 @@ It is simple:
 ocamlc unix.cma anyweb.ml -o anyweb
 {end}
 
-{section 1|Running Examples}
+{section 1|Run Examples}
 
-This document comes from {t|anyweb}'s source {i|piped}
+This document comes from {t|anyweb} running on its source
+({link https://github.com/smondet/anyweb/blob/master/anyweb.ml
+|{t|anyweb.ml}})
+{i|piped}
 to {link http://bracetax.berlios.de/ |bracetax}:
 {code}
 anyweb camlbrtxhtml anyweb.ml | \
     brtx -doc -o index.html  -title "The anyweb Source" -link-css anyweb.css
 {end}
-if you are curious, here is {link ./anyweb_no_css.html|a version without CSS}
+if you are curious, here is {link ./anyweb_no_css.html|a version
+without CSS}
 (i.e. with {t|-link-css anyweb.css}).
 {p}
 The same way we can make {link ./anyweb.pdf |a PDF}:
@@ -62,13 +70,13 @@ anyweb coqbrtxlatex subset_notes.v | \
     brtx -latex -o coq_example.tex -doc -use-package coqdoc
 pdflatex coq_example
 {end}
-The results are some pieces of
+The results are available in
 {link coq_example.html|HTML} and
-{link coq_example.pdf|PDF}.
-(these are some notes taken while {i|doing} {link http://adam.chlipala.net/cpdt/
-|CPDT}{~}{...} which is worth reading!).
+{link coq_example.pdf|PDF}
+(these are some notes taken while {i|doing} {link
+http://adam.chlipala.net/cpdt/ |CPDT}).
 
-{section 1|The Code}
+{section 1|Read The Code}
 
 We do not print the code for:
 {code}
@@ -344,7 +352,8 @@ let () =
 {section 1|To-Do List}
 
 {begin list}
-{*} command-line-forged transformers
+  {*} more transformers
+  {*} command-line-forged transformers
 {end} 
 
 
