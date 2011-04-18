@@ -1,0 +1,198 @@
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <!-- Generated with BraceTax -->
+    <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet"  type="text/css" href="anyweb.css" />
+<title></title>
+    </head>
+    <body>
+<div class="header">
+
+  <h1>Some notes and notations&nbsp;&hellip;</h1>
+</div> <!-- END HEADER -->
+<div class="p">
+     This <tt>import</tt> requires <tt>src/Tactics.v</tt> compiled: <div class="code">
+
+<br/>
+<span class="id" type="keyword">Require</span> <span class="id" type="keyword">Import</span> <span class="id" type="var">Tactics</span>.<br/>
+<span class="id" type="keyword">Set</span> <span class="id" type="keyword">Implicit</span> <span class="id" type="var">Arguments</span>.<br/>
+
+<br/>
+</div>
+ </div>
+<div class="p"> Also getting <tt>MoreSpecif</tt> from CPDT (achtung non-free licence). <pre>
+coqc MoreSpecif.v
+</pre> <div class="code">
+
+<br/>
+<span class="id" type="keyword">Require</span> <span class="id" type="keyword">Import</span> <span class="id" type="var">MoreSpecif</span>.<br/>
+<span class="id" type="keyword">Open</span> <span class="id" type="keyword">Scope</span> <span class="id" type="var">specif_scope</span>.<br/>
+
+<br/>
+</div>
+ </div>
+<div class="p">  <tt>pred_string</tt> with its <i>SubSet</i> type takes a theorem only as non-implicit argument. It uses: <pre>
+Notation "!" := (False_rec _ _) : specif_scope.
+Notation "[ e ]" := (exist _ e _) : specif_scope.
+</pre> <div class="code">
+
+<br/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">pred_strong</span> : <span class="id" type="keyword">forall</span> <span class="id" type="var">n</span> : <span class="id" type="var">nat</span>, <span class="id" type="var">n</span> &gt; 0 -&gt; {<span class="id" type="var">m</span> : <span class="id" type="var">nat</span> | <span class="id" type="var">n</span> = <span class="id" type="var">S</span> <span class="id" type="var">m</span>}.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">refine</span> (<span class="id" type="keyword">fun</span> <span class="id" type="var">n</span> =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">match</span> <span class="id" type="var">n</span> <span class="id" type="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" type="var">O</span> =&gt; <span class="id" type="keyword">fun</span> <span class="id" type="var">_</span> =&gt; !<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" type="var">S</span> <span class="id" type="var">n'</span> =&gt; <span class="id" type="keyword">fun</span> <span class="id" type="var">_</span> =&gt; [<span class="id" type="var">n'</span>]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">end</span>); <span class="id" type="var">crush</span>.<br/>
+<span class="id" type="keyword">Defined</span>.<br/>
+
+<br/>
+<span class="id" type="keyword">Theorem</span> <span class="id" type="var">two_gt0</span> : 2 &gt; 0.<br/>
+&nbsp;&nbsp;<span class="id" type="var">crush</span>.<br/>
+<span class="id" type="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" type="keyword">Eval</span> <span class="id" type="tactic">compute</span> <span class="id" type="keyword">in</span> <span class="id" type="var">pred_strong</span> <span class="id" type="var">two_gt0</span>.<br/>
+
+<br/>
+</div>
+  </div>
+<div class="p">  With <pre>
+Notation "'Yes'" := (left _ _).
+Notation "'No'" := (right _ _).
+Notation "'Reduce' x" := (if x then Yes else No) (at level 50).
+</pre> <tt>eq_nat_dec</tt> compares two natural numbers, returning either a proof of their equality or a proof of their inequality: <div class="code">
+
+<br/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">eq_nat_dec</span> : <span class="id" type="keyword">forall</span> <span class="id" type="var">n</span> <span class="id" type="var">m</span> : <span class="id" type="var">nat</span>, {<span class="id" type="var">n</span> = <span class="id" type="var">m</span>} + {<span class="id" type="var">n</span> &lt;&gt; <span class="id" type="var">m</span>}.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">refine</span> (<span class="id" type="var">fix</span> <span class="id" type="var">f</span> (<span class="id" type="var">n</span> <span class="id" type="var">m</span> : <span class="id" type="var">nat</span>) : {<span class="id" type="var">n</span> = <span class="id" type="var">m</span>} + {<span class="id" type="var">n</span> &lt;&gt; <span class="id" type="var">m</span>} :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">match</span> <span class="id" type="var">n</span>, <span class="id" type="var">m</span> <span class="id" type="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" type="var">O</span>, <span class="id" type="var">O</span> =&gt; <span class="id" type="var">Yes</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" type="var">S</span> <span class="id" type="var">n'</span>, <span class="id" type="var">S</span> <span class="id" type="var">m'</span> =&gt; <span class="id" type="var">Reduce</span> (<span class="id" type="var">f</span> <span class="id" type="var">n'</span> <span class="id" type="var">m'</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" type="var">_</span>, <span class="id" type="var">_</span> =&gt; <span class="id" type="var">No</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">end</span>); <span class="id" type="tactic">congruence</span>.<br/>
+<span class="id" type="keyword">Defined</span>.<br/>
+
+<br/>
+<span class="id" type="keyword">Eval</span> <span class="id" type="tactic">compute</span> <span class="id" type="keyword">in</span> <span class="id" type="var">eq_nat_dec</span> 2 2.<br/>
+<span class="id" type="keyword">Eval</span> <span class="id" type="tactic">compute</span> <span class="id" type="keyword">in</span> <span class="id" type="var">eq_nat_dec</span> 2 3.<br/>
+
+<br/>
+</div>
+ </div>
+<div class="p"> Using Coq's: <pre>
+Inductive maybe (A : Set) (P : A -&gt; Prop) : Set :=
+    Unknown : maybe P | Found : forall x : A, P x -&gt; maybe P
+</pre> And Adams': <pre>
+Notation "{{ x | P }}" := (maybe (fun x =&gt; P)).
+Notation "??" := (Unknown _).
+Notation "[[ x ]]" := (Found _ x _).
+</pre> <div class="code">
+
+<br/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">pred_strong_opt</span> : <span class="id" type="keyword">forall</span> <span class="id" type="var">n</span> : <span class="id" type="var">nat</span>, {{<span class="id" type="var">m</span> | <span class="id" type="var">n</span> = <span class="id" type="var">S</span> <span class="id" type="var">m</span>}}.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">refine</span> (<span class="id" type="keyword">fun</span> <span class="id" type="var">n</span> =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">match</span> <span class="id" type="var">n</span> <span class="id" type="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" type="var">O</span> =&gt; ??<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" type="var">S</span> <span class="id" type="var">n'</span> =&gt; [[<span class="id" type="var">n'</span>]]<br/>
+    <span class="id" type="keyword">end</span>); <span class="id" type="tactic">trivial</span>.<br/>
+<span class="id" type="keyword">Defined</span>.<br/>
+<span class="id" type="keyword">Eval</span> <span class="id" type="tactic">compute</span> <span class="id" type="keyword">in</span> <span class="id" type="var">pred_strong_opt</span> 2.<br/>
+<span class="id" type="keyword">Eval</span> <span class="id" type="tactic">compute</span> <span class="id" type="keyword">in</span> <span class="id" type="var">pred_strong_opt</span> 0.<br/>
+
+<br/>
+</div>
+ <i>Pseudo-Monadic notation</i>: <tt>Notation "x &lt;- e1 ; e2"</tt> (propagates the maybe). <div class="code">
+
+<br/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">doublePred</span> : <span class="id" type="keyword">forall</span> <span class="id" type="var">n1</span> <span class="id" type="var">n2</span> : <span class="id" type="var">nat</span>, {{<span class="id" type="var">p</span> | <span class="id" type="var">n1</span> = <span class="id" type="var">S</span> (<span class="id" type="var">fst</span> <span class="id" type="var">p</span>) /\ <span class="id" type="var">n2</span> = <span class="id" type="var">S</span> (<span class="id" type="var">snd</span> <span class="id" type="var">p</span>)}}.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">refine</span> (<span class="id" type="keyword">fun</span> <span class="id" type="var">n1</span> <span class="id" type="var">n2</span> =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">m1</span> &lt;- <span class="id" type="var">pred_strong_opt</span> <span class="id" type="var">n1</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">m2</span> &lt;- <span class="id" type="var">pred_strong_opt</span> <span class="id" type="var">n2</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;[[(<span class="id" type="var">m1</span>, <span class="id" type="var">m2</span>)]]); <span class="id" type="tactic">tauto</span>.<br/>
+<span class="id" type="keyword">Defined</span>.<br/>
+
+<br/>
+</div>
+ <tt>Notation "e1 ;; e2" := (if e1 then e2 else ??)</tt>   (maybe =&gt; ASSERT) <div class="code">
+
+<br/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">positive_difference</span> :<br/>
+&nbsp;&nbsp;<span class="id" type="keyword">forall</span> <span class="id" type="var">n</span> <span class="id" type="var">m</span> : <span class="id" type="var">nat</span>, {{ <span class="id" type="var">k</span> | <span class="id" type="var">k</span> &gt;= 0 /\ <span class="id" type="var">k</span> = <span class="id" type="var">n</span> - <span class="id" type="var">m</span> }}.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">refine</span> (<span class="id" type="keyword">fun</span> <span class="id" type="var">n</span> <span class="id" type="var">m</span> =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">Compare_dec.le_dec</span> <span class="id" type="var">m</span> <span class="id" type="var">n</span>;;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;[[ <span class="id" type="var">n</span> - <span class="id" type="var">m</span> ]]); <span class="id" type="var">crush</span>.<br/>
+<span class="id" type="keyword">Defined</span>.<br/>
+<span class="id" type="keyword">Eval</span> <span class="id" type="tactic">compute</span> <span class="id" type="keyword">in</span> (<span class="id" type="var">positive_difference</span> 4 3).<br/>
+<span class="id" type="keyword">Eval</span> <span class="id" type="tactic">compute</span> <span class="id" type="keyword">in</span> (<span class="id" type="var">positive_difference</span> 3 5).<br/>
+<span class="id" type="keyword">Eval</span> <span class="id" type="tactic">compute</span> <span class="id" type="keyword">in</span> (<span class="id" type="var">positive_difference</span> 4 4).<br/>
+
+<br/>
+</div>
+  </div>
+<div class="p">  The <b>sumor-based</b> type is maximally expressive; any implementation of the type has the same input-output behavior. <pre>
+Inductive sumor (A : Type) (B : Prop) : Type :=
+    inleft : A -&gt; A + {B} | inright : B -&gt; A + {B}
+Notation "!!" := (inright _ _).
+Notation "[[[ x ]]]" := (inleft _ [x]).
+</pre>  <div class="code">
+
+<br/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">pred_strong_sumor</span> : <span class="id" type="keyword">forall</span> <span class="id" type="var">n</span> : <span class="id" type="var">nat</span>, {<span class="id" type="var">m</span> : <span class="id" type="var">nat</span> | <span class="id" type="var">n</span> = <span class="id" type="var">S</span> <span class="id" type="var">m</span>} + {<span class="id" type="var">n</span> = 0}.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">refine</span> (<span class="id" type="keyword">fun</span> <span class="id" type="var">n</span> =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">match</span> <span class="id" type="var">n</span> <span class="id" type="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" type="var">O</span> =&gt; !!<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" type="var">S</span> <span class="id" type="var">n'</span> =&gt; [[[<span class="id" type="var">n'</span>]]]<br/>
+    <span class="id" type="keyword">end</span>); <span class="id" type="tactic">trivial</span>.<br/>
+<span class="id" type="keyword">Defined</span>.<br/>
+
+<br/>
+<span class="id" type="keyword">Eval</span> <span class="id" type="tactic">compute</span> <span class="id" type="keyword">in</span> <span class="id" type="var">pred_strong_sumor</span> 2.<br/>
+<span class="id" type="keyword">Eval</span> <span class="id" type="tactic">compute</span> <span class="id" type="keyword">in</span> <span class="id" type="var">pred_strong_sumor</span> 0.<br/>
+
+<br/>
+</div>
+  </div>
+<div class="p"> <pre>
+Notation "x &lt;-- e1 ; e2" := (match e1 with
+                               | inright _ =&gt; !!
+                               | inleft (exist x _) =&gt; e2
+                             end)
+(right associativity, at level 60).
+</pre> <div class="code">
+
+<br/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">doublePred'</span> : <span class="id" type="keyword">forall</span> <span class="id" type="var">n1</span> <span class="id" type="var">n2</span> : <span class="id" type="var">nat</span>,<br/>
+&nbsp;&nbsp;{<span class="id" type="var">p</span> : <span class="id" type="var">nat</span> * <span class="id" type="var">nat</span> | <span class="id" type="var">n1</span> = <span class="id" type="var">S</span> (<span class="id" type="var">fst</span> <span class="id" type="var">p</span>) /\ <span class="id" type="var">n2</span> = <span class="id" type="var">S</span> (<span class="id" type="var">snd</span> <span class="id" type="var">p</span>)} + {<span class="id" type="var">n1</span> = 0 \/ <span class="id" type="var">n2</span> = 0}.<br/>
+&nbsp;&nbsp;<span class="id" type="tactic">refine</span> (<span class="id" type="keyword">fun</span> <span class="id" type="var">n1</span> <span class="id" type="var">n2</span> =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">m1</span> &lt;-- <span class="id" type="var">pred_strong_sumor</span> <span class="id" type="var">n1</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="var">m2</span> &lt;-- <span class="id" type="var">pred_strong_sumor</span> <span class="id" type="var">n2</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;[[[(<span class="id" type="var">m1</span>, <span class="id" type="var">m2</span>)]]]); <span class="id" type="tactic">tauto</span>.<br/>
+<span class="id" type="keyword">Defined</span>.<br/>
+
+<br/>
+</div>
+  </div>
+<div class="p"> <i>pseudo-monadic assertion</i> with <tt>sumor</tt>: <pre>
+Notation "e1 ;;; e2" := (if e1 then e2 else !!)
+</pre> <div class="code">
+
+<br/>
+<span class="id" type="keyword">Definition</span> <span class="id" type="var">positive_difference_or_proof_n_le_m</span>:<br/>
+&nbsp;&nbsp;<span class="id" type="keyword">forall</span> <span class="id" type="var">n</span> <span class="id" type="var">m</span> : <span class="id" type="var">nat</span>, {<span class="id" type="var">k</span> | <span class="id" type="var">k</span> &gt;= 0 /\ <span class="id" type="var">k</span> = <span class="id" type="var">n</span> - <span class="id" type="var">m</span>} + { <span class="id" type="var">n</span> &lt; <span class="id" type="var">m</span> }.<br/>
+<span class="id" type="tactic">refine</span> (<span class="id" type="keyword">fun</span> <span class="id" type="var">n</span> <span class="id" type="var">m</span> =&gt;<br/>
+&nbsp;&nbsp;<span class="id" type="var">Compare_dec.le_dec</span> <span class="id" type="var">m</span> <span class="id" type="var">n</span>;;;<br/>
+&nbsp;&nbsp;[[[ <span class="id" type="var">n</span> - <span class="id" type="var">m</span> ]]]);<br/>
+<span class="id" type="var">crush</span>.<br/>
+<span class="id" type="keyword">Defined</span>.<br/>
+<span class="id" type="keyword">Eval</span> <span class="id" type="tactic">compute</span> <span class="id" type="keyword">in</span> (<span class="id" type="var">positive_difference_or_proof_n_le_m</span> 4 3).<br/>
+<span class="id" type="keyword">Eval</span> <span class="id" type="tactic">compute</span> <span class="id" type="keyword">in</span> (<span class="id" type="var">positive_difference_or_proof_n_le_m</span> 3 5).<br/>
+<span class="id" type="keyword">Eval</span> <span class="id" type="tactic">compute</span> <span class="id" type="keyword">in</span> (<span class="id" type="var">positive_difference_or_proof_n_le_m</span> 4 4).<br/>
+
+<br/>
+</div>
+</div>
+</body>
+</html>

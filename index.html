@@ -1,0 +1,268 @@
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <!-- Generated with BraceTax -->
+    <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet"  type="text/css" href="anyweb.css" />
+<title>The anyweb Source</title>
+    </head>
+    <body>
+<div class="header">
+
+  <h1>The <b>anyweb</b> Hack</h1>
+  <div class="authors"><a href="http://seb.mondet.org">Sebastien Mondet</a></div>
+  <div class="subtitle">Literate Programming With Anything You May Find</div>
+</div> <!-- END HEADER -->
+<div class="p">
+    </div>
+<h2>Compile</h2>
+<div class="p">  It is simple: <pre>
+ocamlc unix.cma anyweb.ml -o anyweb
+</pre>  </div>
+<h2>Running Examples</h2>
+<div class="p">  This document comes from <tt>anyweb</tt>'s source <i>piped</i> to <a href="http://bracetax.berlios.de/">bracetax</a>: <pre>
+anyweb camlbrtx anyweb.ml | \
+    brtx -doc -o index.html  -title "The anyweb Source" -link-css anyweb.css
+</pre> if you are curious, here is <a href="./anyweb_no_css.html">a version without CSS</a> (i.e. with <tt>-link-css anyweb.css</tt>). </div>
+<div class="p"> This other example <a href="coq_example.html">documents a <i>Coq</i> file</a>: <pre>
+anyweb coqbrtx subset_notes.v | \
+    brtx -o coq_example.html -doc -link-css anyweb.css 
+</pre> (there are some notes taken while <i>doing</i> <a href="http://adam.chlipala.net/cpdt/">CPDT</a>&nbsp;&hellip; worth reading!).  </div>
+<h2>The Code</h2>
+<div class="p">  We do not print the code for: <pre>
+val split : string -&gt; string -&gt; string * string
+val line_opt : in_channel -&gt; string option
+val feed : cmd:string -&gt; input:string -&gt; string
+</pre> which can be found <a href="http://ocaml-extlib.googlecode.com/svn/trunk/extlib/extString.ml">in ExtLib</a> and <a href="http://martin.jambon.free.fr/toolbox.html">Camlmix's toolbox</a>.     </div>
+<h3>The environment</h3>
+<div class="p">   <!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>
+
+<span style="font-weight: bold"><span style="color: #0000FF">type</span></span> environment <span style="color: #990000">=</span> <span style="color: #FF0000">{</span>
+  start_token <span style="color: #990000">:</span> <span style="color: #009900">string</span><span style="color: #990000">;</span>
+  on_begin <span style="color: #990000">:</span> <span style="color: #009900">out_channel</span> <span style="color: #990000">-&gt;</span> <span style="color: #009900">unit</span><span style="color: #990000">;</span>
+  on_text<span style="color: #990000">:</span> <span style="color: #009900">out_channel</span> <span style="color: #990000">-&gt;</span> <span style="color: #009900">string</span> <span style="color: #990000">-&gt;</span> <span style="color: #009900">unit</span><span style="color: #990000">;</span>
+  on_change <span style="color: #990000">:</span> <span style="color: #009900">out_channel</span> <span style="color: #990000">-&gt;</span> <span style="color: #009900">unit</span><span style="color: #990000">;</span>
+  end_token <span style="color: #990000">:</span> <span style="color: #009900">string</span><span style="color: #990000">;</span>
+  on_end <span style="color: #990000">:</span> <span style="color: #009900">out_channel</span> <span style="color: #990000">-&gt;</span> <span style="color: #009900">unit</span><span style="color: #990000">;</span>
+  contains <span style="color: #990000">:</span> <span style="color: #009900">string</span> <span style="color: #009900">list</span><span style="color: #990000">;</span>
+<span style="color: #FF0000">}</span>
+<span style="font-weight: bold"><span style="color: #0000FF">let</span></span> environment
+    <span style="color: #990000">?(</span>on_begin <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #0000FF">fun</span></span> o <span style="color: #990000">-&gt;</span> <span style="color: #990000">())</span>
+    <span style="color: #990000">?(</span>on_text <span style="color: #990000">=</span> output_string<span style="color: #990000">)</span>
+    <span style="color: #990000">?(</span>on_change <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #0000FF">fun</span></span> o <span style="color: #990000">-&gt;</span> <span style="color: #990000">())</span>
+    <span style="color: #990000">?(</span>on_end <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #0000FF">fun</span></span> o <span style="color: #990000">-&gt;</span> <span style="color: #990000">())</span>
+    start_token end_token contains <span style="color: #990000">=</span>
+  <span style="color: #FF0000">{</span> on_begin<span style="color: #990000">;</span> on_text<span style="color: #990000">;</span> on_change<span style="color: #990000">;</span> on_end<span style="color: #990000">;</span>
+    start_token<span style="color: #990000">;</span> end_token<span style="color: #990000">;</span> contains <span style="color: #FF0000">}</span>    
+
+</tt></pre>
+ </div>
+<h3>The transformation</h3>
+<div class="p"> <!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>
+
+<span style="font-weight: bold"><span style="color: #0000FF">let</span></span> split_first s l current <span style="color: #990000">=</span>
+  <span style="font-weight: bold"><span style="color: #000080">List</span></span><span style="color: #990000">.</span>fold_left
+    <span style="color: #990000">(</span><span style="font-weight: bold"><span style="color: #0000FF">fun</span></span> m k <span style="color: #990000">-&gt;</span> 
+      <span style="font-weight: bold"><span style="color: #0000FF">match</span></span> m<span style="color: #990000">,</span> k <span style="font-weight: bold"><span style="color: #0000FF">with</span></span>
+      <span style="color: #990000">|</span> <span style="color: #009900">None</span><span style="color: #990000">,</span> x <span style="color: #990000">-&gt;</span> x
+      <span style="color: #990000">|</span> x<span style="color: #990000">,</span> <span style="color: #009900">None</span> <span style="color: #990000">-&gt;</span> x
+      <span style="color: #990000">|</span> <span style="color: #009900">Some</span> <span style="color: #990000">(</span>_<span style="color: #990000">,</span> _<span style="color: #990000">,</span> mb<span style="color: #990000">,</span> _<span style="color: #990000">),</span> <span style="color: #009900">Some</span> <span style="color: #990000">(</span>_<span style="color: #990000">,</span> _<span style="color: #990000">,</span> kb<span style="color: #990000">,</span> _<span style="color: #990000">)</span> <span style="color: #990000">-&gt;</span>
+        <span style="font-weight: bold"><span style="color: #0000FF">if</span></span> <span style="font-weight: bold"><span style="color: #000080">String</span></span><span style="color: #990000">.</span>length mb <span style="color: #990000">&lt;=</span> <span style="font-weight: bold"><span style="color: #000080">String</span></span><span style="color: #990000">.</span>length kb <span style="font-weight: bold"><span style="color: #0000FF">then</span></span> m <span style="font-weight: bold"><span style="color: #0000FF">else</span></span> k<span style="color: #990000">)</span>
+    <span style="color: #009900">None</span>
+    <span style="color: #990000">((</span><span style="font-weight: bold"><span style="color: #0000FF">match</span></span> split_opt s current<span style="color: #990000">.</span>end_token <span style="font-weight: bold"><span style="color: #0000FF">with</span></span> 
+      <span style="color: #009900">None</span> <span style="color: #990000">-&gt;</span> <span style="color: #009900">None</span> <span style="color: #990000">|</span> <span style="color: #009900">Some</span> <span style="color: #990000">(</span>b<span style="color: #990000">,</span> a<span style="color: #990000">)</span> <span style="color: #990000">-&gt;</span> <span style="color: #009900">Some</span> <span style="color: #990000">(</span><span style="font-weight: bold"><span style="color: #0000FF">true</span></span><span style="color: #990000">,</span> current<span style="color: #990000">,</span> b<span style="color: #990000">,</span> a<span style="color: #990000">))</span> <span style="color: #990000">::</span>
+        <span style="color: #990000">(</span><span style="font-weight: bold"><span style="color: #000080">List</span></span><span style="color: #990000">.</span>map <span style="color: #990000">(</span><span style="font-weight: bold"><span style="color: #0000FF">fun</span></span> env <span style="color: #990000">-&gt;</span>
+          <span style="font-weight: bold"><span style="color: #0000FF">match</span></span> split_opt s env<span style="color: #990000">.</span>start_token <span style="font-weight: bold"><span style="color: #0000FF">with</span></span>
+          <span style="color: #990000">|</span> <span style="color: #009900">None</span> <span style="color: #990000">-&gt;</span> <span style="color: #009900">None</span>
+          <span style="color: #990000">|</span> <span style="color: #009900">Some</span> <span style="color: #990000">(</span>b<span style="color: #990000">,</span> a<span style="color: #990000">)</span> <span style="color: #990000">-&gt;</span> <span style="color: #009900">Some</span> <span style="color: #990000">(</span><span style="font-weight: bold"><span style="color: #0000FF">false</span></span><span style="color: #990000">,</span> env<span style="color: #990000">,</span> b<span style="color: #990000">,</span> a<span style="color: #990000">))</span> l<span style="color: #990000">))</span>
+
+
+<span style="font-weight: bold"><span style="color: #0000FF">let</span></span> transform environments in_chan out_chan <span style="color: #990000">=</span>
+  <span style="font-weight: bold"><span style="color: #0000FF">let</span></span> <span style="font-weight: bold"><span style="color: #0000FF">rec</span></span> loop stack current_text <span style="color: #990000">=</span>
+    <span style="font-weight: bold"><span style="color: #0000FF">match</span></span> stack <span style="font-weight: bold"><span style="color: #0000FF">with</span></span>
+    <span style="color: #990000">|</span> env <span style="color: #990000">::</span> l <span style="color: #990000">-&gt;</span>
+      <span style="font-weight: bold"><span style="color: #0000FF">let</span></span> inside <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #000080">List</span></span><span style="color: #990000">.</span>map <span style="color: #990000">(</span><span style="font-weight: bold"><span style="color: #0000FF">fun</span></span> x <span style="color: #990000">-&gt;</span> <span style="font-weight: bold"><span style="color: #000080">List</span></span><span style="color: #990000">.</span>assoc x environments<span style="color: #990000">)</span> env<span style="color: #990000">.</span>contains <span style="font-weight: bold"><span style="color: #0000FF">in</span></span>
+      <span style="font-weight: bold"><span style="color: #0000FF">begin</span></span> <span style="font-weight: bold"><span style="color: #0000FF">match</span></span> split_first current_text inside env <span style="font-weight: bold"><span style="color: #0000FF">with</span></span>
+      <span style="color: #990000">|</span> <span style="color: #009900">Some</span> <span style="color: #990000">(</span><span style="font-weight: bold"><span style="color: #0000FF">true</span></span><span style="color: #990000">,</span> s<span style="color: #990000">,</span> before<span style="color: #990000">,</span> after<span style="color: #990000">)</span> <span style="color: #990000">-&gt;</span> <span style="font-style: italic"><span style="color: #9A1900">(* unstack *)</span></span>
+        env<span style="color: #990000">.</span>on_text out_chan before<span style="color: #990000">;</span>
+        env<span style="color: #990000">.</span>on_end out_chan<span style="color: #990000">;</span>
+        loop l after
+      <span style="color: #990000">|</span> <span style="color: #009900">Some</span> <span style="color: #990000">(</span><span style="font-weight: bold"><span style="color: #0000FF">false</span></span><span style="color: #990000">,</span> s<span style="color: #990000">,</span> before<span style="color: #990000">,</span> after<span style="color: #990000">)</span> <span style="color: #990000">-&gt;</span> <span style="font-style: italic"><span style="color: #9A1900">(* stack *)</span></span>
+        env<span style="color: #990000">.</span>on_text out_chan before<span style="color: #990000">;</span>
+        env<span style="color: #990000">.</span>on_change out_chan<span style="color: #990000">;</span>
+        s<span style="color: #990000">.</span>on_begin out_chan<span style="color: #990000">;</span>
+        loop <span style="color: #990000">(</span>s <span style="color: #990000">::</span> stack<span style="color: #990000">)</span> after
+      <span style="color: #990000">|</span> <span style="color: #009900">None</span> <span style="color: #990000">-&gt;</span>
+        env<span style="color: #990000">.</span>on_text out_chan current_text<span style="color: #990000">;</span>
+        <span style="font-weight: bold"><span style="color: #0000FF">begin</span></span> <span style="font-weight: bold"><span style="color: #0000FF">match</span></span> line_opt in_chan <span style="font-weight: bold"><span style="color: #0000FF">with</span></span>
+        <span style="color: #990000">|</span> <span style="color: #009900">Some</span> line <span style="color: #990000">-&gt;</span>
+          loop stack line
+        <span style="color: #990000">|</span> <span style="color: #009900">None</span> <span style="color: #990000">-&gt;</span> env<span style="color: #990000">.</span>on_end out_chan<span style="color: #990000">;</span> <span style="color: #990000">()</span>
+        <span style="font-weight: bold"><span style="color: #0000FF">end</span></span>
+      <span style="font-weight: bold"><span style="color: #0000FF">end</span></span>
+    <span style="color: #990000">|</span> <span style="color: #990000">[]</span> <span style="color: #990000">-&gt;</span>
+      failwith 
+        <span style="color: #990000">(</span>sprintf <span style="color: #FF0000">"Unstacked too much, do not know what to do now: %S"</span> 
+           current_text<span style="color: #990000">)</span>
+  <span style="font-weight: bold"><span style="color: #0000FF">in</span></span>
+  <span style="font-weight: bold"><span style="color: #0000FF">let</span></span> toplevel <span style="color: #990000">=</span> <span style="color: #990000">(</span>snd <span style="color: #990000">(</span><span style="font-weight: bold"><span style="color: #000080">List</span></span><span style="color: #990000">.</span>hd environments<span style="color: #990000">))</span> <span style="font-weight: bold"><span style="color: #0000FF">in</span></span>
+  toplevel<span style="color: #990000">.</span>on_begin out_chan<span style="color: #990000">;</span>
+  loop <span style="color: #990000">[</span> toplevel <span style="color: #990000">]</span> <span style="color: #FF0000">""</span><span style="color: #990000">;</span>
+  <span style="color: #990000">()</span>
+    
+</tt></pre>
+ </div>
+<h3>Available environments</h3>
+<div class="p">  First, a <i>complicated</i> one, used for testing:  <!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>
+
+<span style="font-weight: bold"><span style="color: #0000FF">let</span></span> test_environments <span style="color: #990000">=</span> <span style="color: #990000">[</span>
+  <span style="color: #FF0000">"brackets"</span><span style="color: #990000">,</span>
+  environment
+    <span style="color: #990000">~</span>on_begin<span style="color: #990000">:(</span><span style="font-weight: bold"><span style="color: #0000FF">fun</span></span> o <span style="color: #990000">-&gt;</span> output_string o <span style="color: #FF0000">"(START_BRACKETS)"</span><span style="color: #990000">)</span>
+    <span style="color: #990000">~</span>on_text<span style="color: #990000">:(</span><span style="font-weight: bold"><span style="color: #0000FF">fun</span></span> o s <span style="color: #990000">-&gt;</span> output_string o <span style="color: #990000">(</span><span style="font-weight: bold"><span style="color: #000080">String</span></span><span style="color: #990000">.</span>uppercase s<span style="color: #990000">))</span>
+    <span style="color: #990000">~</span>on_end<span style="color: #990000">:(</span><span style="font-weight: bold"><span style="color: #0000FF">fun</span></span> o <span style="color: #990000">-&gt;</span> output_string o <span style="color: #FF0000">"(END_BRACKETS)"</span><span style="color: #990000">)</span>
+    <span style="color: #FF0000">"[["</span> <span style="color: #FF0000">"]]"</span> <span style="color: #990000">[</span> <span style="color: #FF0000">"braces"</span> <span style="color: #990000">];</span>
+  <span style="color: #FF0000">"braces"</span><span style="color: #990000">,</span>
+  environment
+    <span style="color: #990000">~</span>on_begin<span style="color: #990000">:(</span><span style="font-weight: bold"><span style="color: #0000FF">fun</span></span> o <span style="color: #990000">-&gt;</span> output_string o <span style="color: #FF0000">"(START_BRACES)"</span><span style="color: #990000">)</span>
+    <span style="color: #990000">~</span>on_text<span style="color: #990000">:(</span><span style="font-weight: bold"><span style="color: #0000FF">fun</span></span> o s <span style="color: #990000">-&gt;</span> output_string o <span style="color: #990000">(</span><span style="font-weight: bold"><span style="color: #000080">String</span></span><span style="color: #990000">.</span>uppercase s<span style="color: #990000">))</span>
+    <span style="color: #990000">~</span>on_end<span style="color: #990000">:(</span><span style="font-weight: bold"><span style="color: #0000FF">fun</span></span> o <span style="color: #990000">-&gt;</span> output_string o <span style="color: #FF0000">"(END_BRACES)"</span><span style="color: #990000">)</span>
+    <span style="color: #FF0000">"{{"</span> <span style="color: #FF0000">"}}"</span> <span style="color: #990000">[</span> <span style="color: #FF0000">"LTGTs"</span><span style="color: #990000">;</span> <span style="color: #FF0000">"parens"</span> <span style="color: #990000">];</span>
+  <span style="color: #FF0000">"LTGTs"</span><span style="color: #990000">,</span>
+  environment
+    <span style="color: #990000">~</span>on_begin<span style="color: #990000">:(</span><span style="font-weight: bold"><span style="color: #0000FF">fun</span></span> o <span style="color: #990000">-&gt;</span> output_string o <span style="color: #FF0000">"(START_LTGTs)"</span><span style="color: #990000">)</span>
+    <span style="color: #990000">~</span>on_text<span style="color: #990000">:(</span><span style="font-weight: bold"><span style="color: #0000FF">fun</span></span> o s <span style="color: #990000">-&gt;</span> output_string o <span style="color: #990000">(</span><span style="font-weight: bold"><span style="color: #000080">String</span></span><span style="color: #990000">.</span>uppercase s<span style="color: #990000">))</span>
+    <span style="color: #990000">~</span>on_end<span style="color: #990000">:(</span><span style="font-weight: bold"><span style="color: #0000FF">fun</span></span> o <span style="color: #990000">-&gt;</span> output_string o <span style="color: #FF0000">"(END_LTGTs)"</span><span style="color: #990000">)</span>
+    <span style="color: #FF0000">"&lt;&lt;"</span> <span style="color: #FF0000">"&gt;&gt;"</span> <span style="color: #990000">[];</span>
+  <span style="color: #FF0000">"parens"</span><span style="color: #990000">,</span> 
+  environment
+    <span style="color: #990000">~</span>on_begin<span style="color: #990000">:(</span><span style="font-weight: bold"><span style="color: #0000FF">fun</span></span> o <span style="color: #990000">-&gt;</span> output_string o <span style="color: #FF0000">"(START_PARENS)"</span><span style="color: #990000">)</span>
+    <span style="color: #990000">~</span>on_text<span style="color: #990000">:(</span><span style="font-weight: bold"><span style="color: #0000FF">fun</span></span> o s <span style="color: #990000">-&gt;</span> output_string o <span style="color: #990000">(</span><span style="font-weight: bold"><span style="color: #000080">String</span></span><span style="color: #990000">.</span>uppercase s<span style="color: #990000">))</span>
+    <span style="color: #990000">~</span>on_end<span style="color: #990000">:(</span><span style="font-weight: bold"><span style="color: #0000FF">fun</span></span> o <span style="color: #990000">-&gt;</span> output_string o <span style="color: #FF0000">"(END_PARENS)"</span><span style="color: #990000">)</span>
+    <span style="color: #FF0000">"((("</span> <span style="color: #FF0000">")))"</span> <span style="color: #990000">[</span> <span style="color: #FF0000">"brackets"</span> <span style="color: #990000">];</span>
+<span style="color: #990000">]</span>
+
+</tt></pre>
+  </div>
+<div class="p"> A function to create two functions: one which which stores in a buffer, and another one which gives the contents of the buffer to the argument and clears the <i>internal</i> buffer.  <!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>
+<span style="font-weight: bold"><span style="color: #0000FF">let</span></span> bufferise_and_do f <span style="color: #990000">=</span>
+  <span style="font-weight: bold"><span style="color: #0000FF">let</span></span> buffer <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #000080">Buffer</span></span><span style="color: #990000">.</span>create <span style="color: #993399">42</span> <span style="font-weight: bold"><span style="color: #0000FF">in</span></span>
+  <span style="color: #990000">((</span><span style="font-weight: bold"><span style="color: #0000FF">fun</span></span> o s <span style="color: #990000">-&gt;</span> <span style="font-weight: bold"><span style="color: #000080">Buffer</span></span><span style="color: #990000">.</span>add_string buffer s<span style="color: #990000">),</span>
+   <span style="color: #990000">(</span><span style="font-weight: bold"><span style="color: #0000FF">fun</span></span> o <span style="color: #990000">-&gt;</span>
+     <span style="font-weight: bold"><span style="color: #0000FF">let</span></span> stuff_done <span style="color: #990000">=</span> f <span style="color: #990000">(</span><span style="font-weight: bold"><span style="color: #000080">Buffer</span></span><span style="color: #990000">.</span>contents buffer<span style="color: #990000">)</span> <span style="font-weight: bold"><span style="color: #0000FF">in</span></span>
+     output_string o stuff_done<span style="color: #990000">;</span>
+     <span style="font-weight: bold"><span style="color: #000080">Buffer</span></span><span style="color: #990000">.</span>clear buffer<span style="color: #990000">))</span>
+</tt></pre>
+  </div>
+<div class="p">  This function name is self-explanatory:  <!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>
+<span style="font-weight: bold"><span style="color: #0000FF">let</span></span> is_whitespace s <span style="color: #990000">=</span>
+  <span style="font-weight: bold"><span style="color: #0000FF">try</span></span>
+    <span style="font-weight: bold"><span style="color: #000080">String</span></span><span style="color: #990000">.</span>iter <span style="color: #990000">(</span><span style="font-weight: bold"><span style="color: #0000FF">function</span></span>
+      <span style="color: #990000">|</span> ' ' <span style="color: #990000">|</span> '<span style="color: #990000">\</span>n' <span style="color: #990000">|</span> '<span style="color: #990000">\</span>r' <span style="color: #990000">|</span> '<span style="color: #990000">\</span>t' <span style="color: #990000">-&gt;</span> <span style="color: #990000">()</span>
+      <span style="color: #990000">|</span> c <span style="color: #990000">-&gt;</span> raise <span style="color: #009900">Exit</span><span style="color: #990000">)</span> s<span style="color: #990000">;</span>
+    <span style="font-weight: bold"><span style="color: #0000FF">true</span></span>
+  <span style="font-weight: bold"><span style="color: #0000FF">with</span></span> <span style="color: #009900">Exit</span> <span style="color: #990000">-&gt;</span> <span style="font-weight: bold"><span style="color: #0000FF">false</span></span>
+
+</tt></pre>
+ </div>
+<div class="p">  The few tricks needed now here are:   
+<ul>
+   <li> The <tt>coqdoc</tt> command line: we use <tt>cat</tt> to dump <tt>stdin</tt> to   a file, and then we call <tt>coqdoc</tt>.   </li>
+<li> We have to write things like <i><tt>"(*" ^ "B"</tt></i> or <i><tt>"B" ^ "*)"</tt></i> to   allow <tt>anyweb</tt> to run on its own source.   </li>
+</ul>
+ This gives the <tt>coqbrtx</tt> transformer:   <!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>
+
+<span style="font-weight: bold"><span style="color: #0000FF">let</span></span> coqbrtx <span style="color: #990000">=</span> 
+  <span style="font-weight: bold"><span style="color: #0000FF">let</span></span> coqdoc <span style="color: #990000">=</span>
+    "cat <span style="color: #990000">&gt;</span> <span style="color: #990000">/</span>tmp<span style="color: #990000">/</span>ttt<span style="color: #990000">.</span>v <span style="color: #990000">;</span> coqdoc <span style="color: #990000">-</span>s <span style="color: #990000">--</span>parse<span style="color: #990000">-</span>comments <span style="color: #990000">--</span>stdout <span style="color: #990000">\</span>
+      <span style="color: #990000">--</span>body<span style="color: #990000">-</span>only <span style="color: #990000">--</span>no<span style="color: #990000">-</span>index <span style="color: #990000">/</span>tmp<span style="color: #990000">/</span>ttt<span style="color: #990000">.</span>v" <span style="font-weight: bold"><span style="color: #0000FF">in</span></span> 
+  <span style="color: #990000">[</span>
+    <span style="color: #FF0000">"coq"</span><span style="color: #990000">,</span>  
+    <span style="color: #990000">(</span><span style="font-weight: bold"><span style="color: #0000FF">let</span></span> on_text<span style="color: #990000">,</span> on_end <span style="color: #990000">=</span>
+       bufferise_and_do <span style="color: #990000">(</span><span style="font-weight: bold"><span style="color: #0000FF">fun</span></span> input <span style="color: #990000">-&gt;</span>
+         <span style="font-weight: bold"><span style="color: #0000FF">if</span></span> is_whitespace input <span style="font-weight: bold"><span style="color: #0000FF">then</span></span> <span style="color: #FF0000">"# Removed whitespace\n"</span>
+         <span style="font-weight: bold"><span style="color: #0000FF">else</span></span>
+           <span style="color: #FF0000">"{bypass endanywebbypass}"</span> <span style="color: #990000">^</span> <span style="color: #990000">(</span>feed <span style="color: #990000">~</span>cmd<span style="color: #990000">:</span>coqdoc <span style="color: #990000">~</span>input<span style="color: #990000">)</span>
+           <span style="color: #990000">^</span> <span style="color: #FF0000">"{endanywebbypass}"</span><span style="color: #990000">)</span> <span style="font-weight: bold"><span style="color: #0000FF">in</span></span>
+     environment <span style="color: #990000">~</span>on_text <span style="color: #990000">~</span>on_end <span style="color: #990000">~</span>on_change<span style="color: #990000">:</span>on_end
+       <span style="color: #FF0000">"[coq["</span> <span style="color: #FF0000">"]coq]"</span> <span style="color: #990000">[</span> <span style="color: #FF0000">"bracetax"</span> <span style="color: #990000">]);</span>
+    <span style="color: #FF0000">"bracetax"</span><span style="color: #990000">,</span> environment <span style="color: #990000">(</span><span style="color: #FF0000">"(*"</span> <span style="color: #990000">^</span> <span style="color: #FF0000">"B"</span><span style="color: #990000">)</span> <span style="color: #990000">(</span><span style="color: #FF0000">"B"</span> <span style="color: #990000">^</span> <span style="color: #FF0000">"*)"</span><span style="color: #990000">)</span> <span style="color: #990000">[</span> <span style="color: #FF0000">"coq"</span> <span style="color: #990000">];</span>
+  <span style="color: #990000">]</span>
+
+</tt></pre>
+ </div>
+<div class="p"> And similarly the <tt>camlbrtx</tt> one:  <!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>
+<span style="font-weight: bold"><span style="color: #0000FF">let</span></span> camlbrtx <span style="color: #990000">=</span> <span style="color: #990000">[</span>
+  <span style="color: #FF0000">"caml"</span><span style="color: #990000">,</span>  
+  <span style="color: #990000">(</span><span style="font-weight: bold"><span style="color: #0000FF">let</span></span> on_text<span style="color: #990000">,</span> on_end <span style="color: #990000">=</span>
+     <span style="font-weight: bold"><span style="color: #0000FF">let</span></span> cmd <span style="color: #990000">=</span> <span style="color: #FF0000">"source-highlight -s caml -f xhtml"</span> <span style="font-weight: bold"><span style="color: #0000FF">in</span></span>
+     bufferise_and_do <span style="color: #990000">(</span><span style="font-weight: bold"><span style="color: #0000FF">fun</span></span> input <span style="color: #990000">-&gt;</span>
+       <span style="font-weight: bold"><span style="color: #0000FF">if</span></span> is_whitespace input <span style="font-weight: bold"><span style="color: #0000FF">then</span></span> <span style="color: #FF0000">"# Removed whitespace\n"</span>
+       <span style="font-weight: bold"><span style="color: #0000FF">else</span></span>
+         <span style="color: #FF0000">"{bypass endanywebcode}"</span> <span style="color: #990000">^</span> <span style="color: #990000">(</span>feed <span style="color: #990000">~</span>cmd <span style="color: #990000">~</span>input<span style="color: #990000">)</span> <span style="color: #990000">^</span> <span style="color: #FF0000">"{endany"</span> <span style="color: #990000">^</span> <span style="color: #FF0000">"webcode}"</span><span style="color: #990000">)</span> <span style="font-weight: bold"><span style="color: #0000FF">in</span></span>
+   environment  <span style="color: #990000">~</span>on_text <span style="color: #990000">~</span>on_end <span style="color: #990000">~</span>on_change<span style="color: #990000">:</span>on_end
+     <span style="color: #990000">(</span><span style="color: #FF0000">"[ca"</span> <span style="color: #990000">^</span> <span style="color: #FF0000">"ml["</span><span style="color: #990000">)</span> <span style="color: #990000">(</span><span style="color: #FF0000">"]ca"</span> <span style="color: #990000">^</span> <span style="color: #FF0000">"ml]"</span><span style="color: #990000">)</span> <span style="color: #990000">[</span> <span style="color: #FF0000">"bracetax"</span> <span style="color: #990000">]);</span>
+  <span style="color: #FF0000">"bracetax"</span><span style="color: #990000">,</span> environment <span style="color: #990000">(</span><span style="color: #FF0000">"(*"</span> <span style="color: #990000">^</span> <span style="color: #FF0000">"B"</span><span style="color: #990000">)</span> <span style="color: #990000">(</span><span style="color: #FF0000">"B"</span> <span style="color: #990000">^</span> <span style="color: #FF0000">"*)"</span><span style="color: #990000">)</span> <span style="color: #990000">[</span> <span style="color: #FF0000">"caml"</span> <span style="color: #990000">];</span>
+<span style="color: #990000">]</span>
+
+</tt></pre>
+ </div>
+<h3>The &ldquo;main&rdquo; function</h3>
+<div class="p"> <!-- Generator: GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>
+  
+<span style="font-weight: bold"><span style="color: #0000FF">let</span></span> <span style="color: #990000">()</span> <span style="color: #990000">=</span>
+  <span style="font-weight: bold"><span style="color: #0000FF">let</span></span> lang <span style="color: #990000">=</span> 
+    <span style="font-weight: bold"><span style="color: #0000FF">try</span></span> <span style="font-weight: bold"><span style="color: #0000FF">match</span></span> <span style="font-weight: bold"><span style="color: #000080">Sys</span></span><span style="color: #990000">.</span>argv<span style="color: #990000">.(</span><span style="color: #993399">1</span><span style="color: #990000">)</span> <span style="font-weight: bold"><span style="color: #0000FF">with</span></span>
+    <span style="color: #990000">|</span> <span style="color: #FF0000">"coqbrtx"</span> <span style="color: #990000">-&gt;</span> coqbrtx
+    <span style="color: #990000">|</span> <span style="color: #FF0000">"camlbrtx"</span> <span style="color: #990000">-&gt;</span> camlbrtx
+    <span style="color: #990000">|</span> _ <span style="color: #990000">-&gt;</span> test_environments
+    <span style="font-weight: bold"><span style="color: #0000FF">with</span></span> e <span style="color: #990000">-&gt;</span> test_environments <span style="font-weight: bold"><span style="color: #0000FF">in</span></span>
+  <span style="font-weight: bold"><span style="color: #0000FF">let</span></span> i <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #0000FF">try</span></span> open_in <span style="font-weight: bold"><span style="color: #000080">Sys</span></span><span style="color: #990000">.</span>argv<span style="color: #990000">.(</span><span style="color: #993399">2</span><span style="color: #990000">)</span> <span style="font-weight: bold"><span style="color: #0000FF">with</span></span> e <span style="color: #990000">-&gt;</span> stdin <span style="font-weight: bold"><span style="color: #0000FF">in</span></span>
+  <span style="font-weight: bold"><span style="color: #0000FF">let</span></span> o <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #0000FF">try</span></span> open_out <span style="font-weight: bold"><span style="color: #000080">Sys</span></span><span style="color: #990000">.</span>argv<span style="color: #990000">.(</span><span style="color: #993399">3</span><span style="color: #990000">)</span> <span style="font-weight: bold"><span style="color: #0000FF">with</span></span> e <span style="color: #990000">-&gt;</span> stdout <span style="font-weight: bold"><span style="color: #0000FF">in</span></span>
+  transform lang i o<span style="color: #990000">;</span>
+  close_in i<span style="color: #990000">;</span> close_out o
+
+</tt></pre>
+  </div>
+<h2>To-Do List</h2>
+<div class="p">  
+<ul>
+ <li> command-line-forged transformers </li>
+</ul>
+     </div>
+</body>
+</html>
