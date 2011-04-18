@@ -97,7 +97,7 @@ Notation "[[ x ]]" := (Found _ x _).
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">match</span> <span class="id" type="var">n</span> <span class="id" type="keyword">with</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" type="var">O</span> =&gt; ??<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" type="var">S</span> <span class="id" type="var">n'</span> =&gt; [[<span class="id" type="var">n'</span>]]<br/>
-    <span class="id" type="keyword">end</span>); <span class="id" type="tactic">trivial</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">end</span>); <span class="id" type="tactic">trivial</span>.<br/>
 <span class="id" type="keyword">Defined</span>.<br/>
 <span class="id" type="keyword">Eval</span> <span class="id" type="tactic">compute</span> <span class="id" type="keyword">in</span> <span class="id" type="var">pred_strong_opt</span> 2.<br/>
 <span class="id" type="keyword">Eval</span> <span class="id" type="tactic">compute</span> <span class="id" type="keyword">in</span> <span class="id" type="var">pred_strong_opt</span> 0.<br/>
@@ -145,7 +145,7 @@ Notation "[[[ x ]]]" := (inleft _ [x]).
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">match</span> <span class="id" type="var">n</span> <span class="id" type="keyword">with</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" type="var">O</span> =&gt; !!<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" type="var">S</span> <span class="id" type="var">n'</span> =&gt; [[[<span class="id" type="var">n'</span>]]]<br/>
-    <span class="id" type="keyword">end</span>); <span class="id" type="tactic">trivial</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" type="keyword">end</span>); <span class="id" type="tactic">trivial</span>.<br/>
 <span class="id" type="keyword">Defined</span>.<br/>
 
 <br/>
