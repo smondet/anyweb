@@ -13,3 +13,7 @@ anyweb coqbrtxhtml subset_notes.v | \
 anyweb coqbrtxlatex subset_notes.v | \
     brtx -latex -o coq_example.tex -doc -use-package coqdoc
 pdflatex coq_example
+
+mkdir -p website
+mv *.html *.pdf  website/
+cp anyweb.css website/
