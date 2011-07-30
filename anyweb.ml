@@ -286,51 +286,56 @@ let is_whitespace s =
   with Exit -> false
 
 (*B {p}
- The few tricks needed now here are:
-  {begin list}
-  {*} The {t|coqdoc} command line: we use {t|cat} to dump {t|stdin} to
-  a file, and then we call {t|coqdoc}.
-  {*} We have to write things like {i|{t|"(*" ^ "B"}} or {i|{t|"B" ^ "*)"}} to
-  allow {t|anyweb} to run on its own source.
-  {end}
-This gives the {t|coqbrtx} transformer:
+A small trick is needed now here.
+We have to write things like {i|{t|"(*" ^ "B"}} or {i|{t|"]ca" ^ "ml]"}} to
+allow {t|anyweb} to run on its own source.
+This gives the {t|camlbrtx} transformer (which depends on the output
+format HTML or LaTeX):
   B*)
 
+let caml fmt =
+  ("caml",  
+   (let on_text, on_end =
+      let cmd = 
+        sprintf "source-highlight -s caml -f %s" 
+          (match fmt with `html -> "xhtml" | `latex -> "latex") in
+      bufferise_and_do (fun input ->
+        if is_whitespace input then "# Removed whitespace\n"
+        else
+          "{bypass endanywebcode}" ^ (feed ~cmd ~input) ^ "{endany" ^ "webcode}") in
+    environment  ~on_text ~on_end ~on_change:on_end
+      ("[ca" ^ "ml[") ("]ca" ^ "ml]") [ "bracetax" ]))
+let camlbrtx fmt = [
+  caml fmt;
+  "bracetax", environment ("(*" ^ "B") ("B" ^ "*)") [ "caml" ];
+]
+
+(*B {p}
+For the {t|coqdoc} command line: we use {t|cat} to dump {t|stdin} to
+a file, and then we call {t|coqdoc}. By the way,
+Coq comments can contain OCaml code.
+  B*)
 let coqbrtx fmt = 
   let coqdoc =
     sprintf
       "cat > /tmp/ttt.v ; coqdoc -s --parse-comments --stdout \
         --body-only --no-index %s /tmp/ttt.v"
       (match fmt with `html -> "--html" | `latex -> "--latex") in 
-  [
-    "coq",  
-    (let on_text, on_end =
-       bufferise_and_do (fun input ->
-         if is_whitespace input then "# Removed whitespace\n"
-         else
-           "{bypass endanywebbypass}" ^ (feed ~cmd:coqdoc ~input)
-           ^ "{endanywebbypass}") in
-     environment ~on_text ~on_end ~on_change:on_end
-       "[coq[" "]coq]" [ "bracetax" ]);
-    "bracetax", environment ("(*" ^ "B") ("B" ^ "*)") [ "coq" ];
+  let coq =
+    ("coq",  
+     (let on_text, on_end =
+        bufferise_and_do (fun input ->
+          if is_whitespace input then "# Removed whitespace\n"
+          else
+            "{bypass endanywebbypass}" ^ (feed ~cmd:coqdoc ~input)
+            ^ "{endanywebbypass}") in
+      environment ~on_text ~on_end ~on_change:on_end
+        "[coq[" "]coq]" [ "bracetax" ])) in
+  
+  [ coq; caml fmt; 
+    "bracetax", environment ("(*" ^ "B") ("B" ^ "*)") [ "coq"; "caml" ];
   ]
 
-(*B {p}
-And similarly the {t|camlbrtx} one:  B*)
-let camlbrtx fmt = [
-  "caml",  
-  (let on_text, on_end =
-     let cmd = 
-       sprintf "source-highlight -s caml -f %s" 
-         (match fmt with `html -> "xhtml" | `latex -> "latex") in
-     bufferise_and_do (fun input ->
-       if is_whitespace input then "# Removed whitespace\n"
-       else
-         "{bypass endanywebcode}" ^ (feed ~cmd ~input) ^ "{endany" ^ "webcode}") in
-   environment  ~on_text ~on_end ~on_change:on_end
-     ("[ca" ^ "ml[") ("]ca" ^ "ml]") [ "bracetax" ]);
-  "bracetax", environment ("(*" ^ "B") ("B" ^ "*)") [ "caml" ];
-]
 
 (*B {section 2|The {q|main} function} B*)
   
