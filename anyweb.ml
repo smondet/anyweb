@@ -1,7 +1,7 @@
 (*B {ignore} B*)
 (*
-Copyright (C) 2003 Nicolas Cannasse (two functions from
- ExtString.ml: find and split)
+Copyright (C) 2003 Nicolas Cannasse (three functions from
+ ExtString.ml: find, split, and strip)
 Copyright (C) 2011 Sebastien Mondet (everything else)
 
 This library is free software; you can redistribute it and/or
@@ -120,7 +120,20 @@ let split str sep =
   let len = String.length sep in
   let slen = String.length str in
   String.sub str 0 p, String.sub str (p + len) (slen - p - len)
-        
+
+let strip ?(chars=" \t\r\n") s =
+  let open String in
+  let p = ref 0 in
+  let l = length s in
+  while !p < l && contains chars (unsafe_get s !p) do
+    incr p;
+  done;
+  let p = !p in
+  let l = ref (l - 1) in
+  while !l >= p && contains chars (unsafe_get s !l) do
+    decr l;
+  done;
+  sub s p (!l - p + 1)        
 
 let find_opt a b = try Some (find a b) with e -> None
 let split_opt s i = try Some (split s i) with e -> None
@@ -287,7 +300,7 @@ let is_whitespace s =
 
 (*B {p}
 A small trick is needed now here.
-We have to write things like {i|{t|"(*" ^ "B"}} or {i|{t|"]ca" ^ "ml]"}} to
+We have to write things like {i|{t|"]ca" ^ "ml]"}} to
 allow {t|anyweb} to run on its own source.
 This gives the {t|camlbrtx} transformer (which depends on the output
 format HTML or LaTeX):
@@ -302,6 +315,7 @@ let caml fmt =
       bufferise_and_do (fun input ->
         if is_whitespace input then "# Removed whitespace\n"
         else
+          let input = strip input in
           "{bypass endanywebcode}" ^ (feed ~cmd ~input) ^ "{endany" ^ "webcode}") in
     environment  ~on_text ~on_end ~on_change:on_end
       ("[ca" ^ "ml[") ("]ca" ^ "ml]") [ "bracetax" ]))
@@ -327,6 +341,7 @@ let coqbrtx fmt =
         bufferise_and_do (fun input ->
           if is_whitespace input then "# Removed whitespace\n"
           else
+            let input = strip input in
             "{bypass endanywebbypass}" ^ (feed ~cmd:coqdoc ~input)
             ^ "{endanywebbypass}") in
       environment ~on_text ~on_end ~on_change:on_end
